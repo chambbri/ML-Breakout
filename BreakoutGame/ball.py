@@ -9,7 +9,7 @@ class Ball:
         self.x_cord = x_cord
         self.y_cord = y_cord
         self.color = color
-        self.y_speed = 0.5
+        self.y_speed = 0.6
         self.x_speed = 0.1
         self.max_speed = 0.5
         self.rect = pygame.Rect(int(self.x_cord - self.radius), int(self.y_cord - self.radius), self.radius * 2,

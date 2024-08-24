@@ -4,6 +4,7 @@ class Stats:
     def __init__(self):
         self.score = 0;
         self.lives = 3;
+        self.level = 1;
 
     def update_score(self, color):
         if color == "red":
@@ -23,3 +24,6 @@ class Stats:
 
     def update_lives(self):
         self.lives -= 1
+
+    def update_level(self):
+        self.level += 1
