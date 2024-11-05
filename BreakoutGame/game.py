@@ -1,8 +1,8 @@
 import pygame
-from brick import *
-from paddle import *
-from ball import *
-from stats import *
+from .brick import *
+from .paddle import *
+from .ball import *
+from .stats import *
 
 SCREEN_WIDTH = 1260
 SCREEN_HEIGHT = 600
@@ -24,8 +24,8 @@ def play_game(screen, bricks, paddle, ball, stats):
         # draw paddle, ball, and brick objects to screen
         pygame.draw.rect(screen, paddle.color, paddle.rect)
         pygame.draw.circle(screen, ball.color, (ball.x_cord, ball.y_cord), ball.radius)
-        for brick in bricks:
-            pygame.draw.rect(screen, brick.color, brick.rect)
+        for b in bricks:
+            pygame.draw.rect(screen, b.color, b.rect)
 
         # user presses SPACE to start game and move ball
         key = pygame.key.get_pressed()
@@ -109,9 +109,9 @@ def create_bricks():
     # create brick objects and add to bricks list
     while row < 7:
         while x_cord + brick_width < SCREEN_WIDTH:
-            brick = Brick(brick_width, brick_height, x_cord, y_cord, colors[row])
+            b = Brick(brick_width, brick_height, x_cord, y_cord, colors[row])
             x_cord += brick_width + 5
-            bricks.append(brick)
+            bricks.append(b)
         x_cord = 2
         y_cord += brick_height + 5
         row += 1
@@ -152,6 +152,9 @@ def paddle_collision(paddle, ball):
         ball_center = ball.x_cord + (ball.radius / 2)
         offset = (ball_center - paddle_center) / (paddle.width / 2)
         ball.x_speed = offset * ball.max_speed
+        return True
+    else:
+        return False
 
 
 def wall_collision(ball):
