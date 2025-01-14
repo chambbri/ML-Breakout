@@ -48,7 +48,7 @@ def play_game(screen, bricks, paddle, ball, stats):
         display_lives(stats.lives, screen)
 
         # determine if life was lost and "pause" game if so
-        lost = life_lost(ball, stats)
+        lost = life_lost(ball, paddle, stats)
         if lost:
             game_started = False
 
@@ -145,15 +145,20 @@ def create_ball():
 def paddle_collision(paddle, ball):
     """Determine if the ball and paddle have collided"""
     if paddle.rect.colliderect(ball.rect):
-        ball.y_speed *= -1  # reverse y-direction
+        if not ball.collision_handled:
+            ball.y_speed *= -1  # reverse y-direction
 
-        # determine x-direction and angle based on where it hit on paddle
-        paddle_center = paddle.x_cord + (paddle.width / 2)
-        ball_center = ball.x_cord + (ball.radius / 2)
-        offset = (ball_center - paddle_center) / (paddle.width / 2)
-        ball.x_speed = offset * ball.max_speed
-        return True
+            # determine x-direction and angle based on where it hit on paddle
+            paddle_center = paddle.x_cord + (paddle.width / 2)
+            ball_center = ball.x_cord + (ball.radius / 2)
+            offset = (ball_center - paddle_center) / (paddle.width / 2)
+            ball.x_speed = offset * ball.max_speed
+            ball.collision_handled = True
+            return True
+        else:
+            return False
     else:
+        ball.collision_handled = False
         return False
 
 
@@ -170,11 +175,15 @@ def wall_collision(ball):
 def brick_collision(ball, bricks, stats):
     """Loop through bricks to determine if there have been any collisions, update score, and
     remove the brick from the bricks list"""
+    collision_happened = False
     for brick in bricks:
         if ball.rect.colliderect(brick.rect):
             ball.y_speed *= -1
             stats.update_score(brick.color)
             bricks.remove(brick)
+            collision_happened = True
+
+    return collision_happened
 
 
 def display_score(score, screen):
@@ -191,12 +200,13 @@ def display_lives(lives, screen):
     screen.blit(img, (10, 10))
 
 
-def life_lost(ball, stats):
+def life_lost(ball, paddle, stats):
     """Updates number of user lives if the ball has gone below the paddle and resets the ball to starting position"""
-    if ball.y_cord >= SCREEN_HEIGHT:
+    if ball.y_cord >= (SCREEN_HEIGHT - 25):
         stats.update_lives()
         if stats.lives > 0:
             ball.reset_ball()
+            paddle.reset_paddle()
         return True
     return False
 
