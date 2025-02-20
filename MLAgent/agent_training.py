@@ -6,9 +6,9 @@ import random
 import numpy as np
 from MLAgent.model import NN, QTrainer
 
-MAX_MEMORY = 10000
-BATCH_SIZE = 32
-LR = 0.001
+MAX_MEMORY = 100000
+BATCH_SIZE = 64
+LR = 0.0005
 
 
 class Agent:
@@ -16,17 +16,17 @@ class Agent:
     def __init__(self):
         self.n_games = 0
         self.epsilon = 0
-        self.gamma = 0.99
+        self.gamma = 0.9
         self.env = BreakoutEnv()
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = NN(9, 256, 3)
+        self.model = NN(7, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
         self.state_mean = 0
         self.state_std = 1e-5  # Small value to avoid division by zero
 
     def normalize_state(self, state):
-        paddle_x, ball_x, ball_y, ball_x_speed, ball_y_speed, brick_layout, \
-            relative_x, relative_y, ball_reset_flag = state
+        paddle_x, ball_x, ball_y, ball_x_speed, ball_y_speed, \
+            relative_x, relative_y = state
         max_screen_width = 1260
         max_screen_height = 600
 
@@ -34,13 +34,12 @@ class Agent:
         ball_x /= max_screen_width
         ball_y /= max_screen_height
 
-        relative_x = max_screen_width
-        relative_y = max_screen_height
+        relative_x /= max_screen_width
+        relative_y /= max_screen_height
 
-        max_bricks = 77
-        brick_layout /= max_bricks
-        return np.array([paddle_x, ball_x, ball_y, ball_x_speed, ball_y_speed, relative_x, relative_y,
-                         brick_layout, ball_reset_flag], dtype=np.float32)
+        # max_bricks = 84
+        # brick_layout /= max_bricks
+        return np.array([paddle_x, ball_x, ball_y, ball_x_speed, ball_y_speed, relative_x, relative_y], dtype=np.float32)
 
     def get_state(self):
         state = self.env.get_obs()

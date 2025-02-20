@@ -60,18 +60,18 @@ class BreakoutEnv(gym.Env):
         # display_lives(self.stats.lives, self.screen)
         # print("Score: ", self.stats.score)
         if paddle_col:
-            reward += 1
+            reward += 3
         if brick_col:
-            reward += 1
+            reward += 0
         new_score = self.stats.score
         # reward += new_score - prev_score
-        proximity_reward = max(0, 1 - abs(self.paddle.x_cord - self.ball.x_cord) / (SCREEN_WIDTH / 2))
-        reward += 0.009 * proximity_reward  # Small reward at each step
+        # proximity_reward = max(0, 1 - abs(self.paddle.x_cord - self.ball.x_cord) / (SCREEN_WIDTH / 2))
+        # reward += 0.005 * proximity_reward  # Small reward at each step
         lost = life_lost(self.ball, self.paddle, self.stats)
 
         if lost:
-            penalty = -5 * (1 - proximity_reward)  # Scaled based on proximity at time of loss
-            reward += penalty
+            # penalty = -5 * (1 - proximity_reward)  # Scaled based on proximity at time of loss
+            reward -= 3
 
         if len(self.bricks) == 0:
             # reward += 10
@@ -92,11 +92,10 @@ class BreakoutEnv(gym.Env):
         relative_x = self.ball.x_cord - self.paddle.x_cord
         relative_y = self.ball.y_cord - self.paddle.y_cord
         # brick_layout = [1 if brick.rect is not None else 0 for brick in self.bricks]
-        brick_layout = len(self.bricks)
-        ball_reset_flag = 1 if self.ball.x_cord == self.ball.x_start and self.ball.y_cord == self.ball.y_start else 0
+        # brick_layout = len(self.bricks)
+        # ball_reset_flag = 1 if self.ball.x_cord == self.ball.x_start and self.ball.y_cord == self.ball.y_start else 0
 
-        obs = np.array([paddle_location] + ball_location + ball_velocity + [brick_layout,
-                       relative_x, relative_y, ball_reset_flag], dtype=np.float32)
+        obs = np.array([paddle_location] + ball_location + ball_velocity + [relative_x, relative_y], dtype=np.float32)
 
         return obs
 
